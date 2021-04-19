@@ -14,13 +14,14 @@
 
 /* Mode */
 #define AN_DIM_MODE 0xf1 /* Analog dimming mode */
-#define OC_3A 0x01       /* Set Over Current to 3A */
-#define REC_MODE 0x05    /* Recoverable mode */
+#define OC_3A 0xe0       /* Set Over Current to 3A */
+#define REC_MODE 0xc4    /* Recoverable mode */
 
 struct mp3385agrz {
 	u32 addr;
     struct i2c_client *client;
 };
+
 
 static int mp3385agrz_write_regs(struct mp3385agrz *mp3385agrz, u8 reg, u8 val)
 {
@@ -50,11 +51,13 @@ static int mp3385agrz_init_regs(struct mp3385agrz *mp3385agrz)
     return ret;
 }
 
+
 static const struct i2c_device_id mp3385agrz_id[] = {
 	{ "mp3385agrz", 0 },
 	{ }
 };
 MODULE_DEVICE_TABLE(i2c, adc128_id);
+
 
 #if defined(CONFIG_OF)
 static const struct of_device_id mp3385agrz_of_match[] = {
@@ -64,15 +67,14 @@ static const struct of_device_id mp3385agrz_of_match[] = {
 MODULE_DEVICE_TABLE(of, mp3385agrz_of_match);
 #endif
 
+
 static int mp3385agrz_i2c_probe(struct i2c_client *client,
 			   const struct i2c_device_id *id)
 {
     struct device *dev = &client->dev;
-    struct device *mp3385agrz_dev;
     struct mp3385agrz *mp3385agrz;
     int ret;
     u32 reg;
-    static u8 test;
 
     mp3385agrz = devm_kzalloc(dev, sizeof(struct mp3385agrz), GFP_KERNEL);
 	if (!mp3385agrz)
@@ -98,20 +100,19 @@ static int mp3385agrz_i2c_probe(struct i2c_client *client,
 static int mp3385agrz_i2c_remove(struct i2c_client *client)
 {
 	struct mp3385agrz *mp3385agrz = i2c_get_clientdata(client);
-
-
+    kfree(mp3385agrz);
 
 	return 0;
 }
 
 
-/* machine i2c codec control layer */
 static struct i2c_driver mp3385agrz_i2c_led_driver = {
 	.driver = {
 		.name = "mp3385agrz_led_driver",
 		.of_match_table = of_match_ptr(mp3385agrz_of_match),
 	},
 	.probe	= mp3385agrz_i2c_probe,
+    .remove = mp3385agrz_i2c_remove,
     .id_table	= mp3385agrz_id,
 };
 
