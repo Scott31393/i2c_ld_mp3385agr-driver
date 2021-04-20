@@ -80,10 +80,12 @@ static int mp3385agrz_i2c_probe(struct i2c_client *client,
 	if (!mp3385agrz)
 		return -ENOMEM;
 
+    dev_info(&client->dev, "mp3385agrz is probed\n");
+
+
     ret = of_property_read_u32(dev->of_node, "reg", &reg);
-    printk("KERN_ERR, DEBUG FUNC = %s, LINE = %d, reg = %x \n", __func__, __LINE__, reg);
     if(ret){
-        printk("KERN_ERR, Can't read reg property \n");
+        dev_info(&client->dev, "Can't read reg property\n");
     }
 
     mp3385agrz->addr = reg;
@@ -130,7 +132,7 @@ static void __exit mp3385agrz_exit(void)
 
 late_initcall(mp3385agrz_init);
 module_exit(mp3385agrz_exit);
-// module_i2c_driver(mp3385agrz_i2c_led_driver);
+
 MODULE_DESCRIPTION("MP3385AGR-Z Led Driver");
 MODULE_AUTHOR("Tommaso Merciai");
 MODULE_LICENSE("GPL");
